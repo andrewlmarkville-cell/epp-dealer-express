@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPP Dealer Express | Richard Chung Dual Engine</title>
+    <title>EPP Dealer Express | Executive One-Pay Engine</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
         body { background-color: #0f172a; color: #f8fafc; padding: 12px; }
@@ -62,8 +62,8 @@
     </div>
 
     <div class="tab-container">
-        <div class="tab-btn active-pv" id="tabBtnPv" onclick="switchTab('pv')">Option 1: PV Method<br><span style="font-size:9px; font-weight:normal;">(Richard Chung / Toyota)</span></div>
-        <div class="tab-btn" id="tabBtnMf" onclick="switchTab('mf')">Option 2: MF Method<br><span style="font-size:9px; font-weight:normal;">(BMW / Audi / General OEM)</span></div>
+        <div class="tab-btn active-pv" id="tabBtnPv" onclick="switchTab('pv')">Option 1: Discount Rate<br><span style="font-size:9px; font-weight:normal;">(Toyota / Lexus Model)</span></div>
+        <div class="tab-btn" id="tabBtnMf" onclick="switchTab('mf')">Option 2: MF Reduction<br><span style="font-size:9px; font-weight:normal;">(BMW / Audi / General OEM)</span></div>
     </div>
 
     <div class="card">
@@ -106,57 +106,57 @@
         </div>
     </div>
 
-    <!-- TAB 1: RICHARD CHUNG PV METHOD -->
+    <!-- TAB 1: TOYOTA / LEXUS ONE-PAY METHOD -->
     <div id="tabPv" class="tab-content active">
         <div class="sum-card pv-theme">
             <div class="label">Total Due on Delivery (Inc. Tax)</div>
             <div class="val" id="pvTotalDue">$0</div>
-            <div class="sub" id="pvSub">Richard Chung PV Factor Model</div>
+            <div class="sub" id="pvSavingsSub">Total Interest Savings: $0</div>
         </div>
 
         <div class="card">
-            <div class="card-title">1. One-Pay PV Rate Adjustment</div>
+            <div class="card-title">1. One-Pay Rate Adjustment</div>
             <div class="field">
-                <label>Annual Discount Rate / Rate (%)</label>
+                <label>Discounted One-Pay Rate (%)</label>
                 <input type="number" id="pvRate" value="3.9" step="0.1">
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">Richard Chung Formula Breakdown</div>
+            <div class="card-title">Side-By-Side Comparison</div>
             <div class="res-row">
                 <span class="res-label">Total Selling Price:</span>
                 <span class="res-val" id="pvSellingPrice">$0</span>
             </div>
             <div class="res-row">
-                <span class="res-label">Base Residual Value:</span>
+                <span class="res-label">Residual Value:</span>
                 <span class="res-val" id="pvBaseResidual">$0</span>
             </div>
             <div class="res-row">
-                <span class="res-label">Present Value (PV) Factor:</span>
-                <span class="res-val text-gold" id="pvFactorVal">0.000000</span>
+                <span class="res-label">Base Vehicle Depreciation:</span>
+                <span class="res-val" id="pvBaseDep">$0</span>
             </div>
             <div class="res-row">
-                <span class="res-label">Net Cap Cost (Residual × PV Factor):</span>
-                <span class="res-val text-gold" id="pvNetCapVal">$0</span>
-            </div>
-            <div class="res-row">
-                <span class="res-label">Pre-Tax One-Pay Total:</span>
-                <span class="res-val text-gold" id="pvPreTaxVal">$0</span>
-            </div>
-            <div class="res-row">
-                <span class="res-label">Standard Lease Total Baseline:</span>
+                <span class="res-label">Standard Lease Total (36 Mos):</span>
                 <span class="res-val" id="pvStdTotal">$0</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label">One-Pay Finance Charge (Inc. Tax):</span>
+                <span class="res-val text-gold" id="pvFinChargeVal">$0</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label">Total Net Interest Savings:</span>
+                <span class="res-val text-gold" id="pvSavingsVal">$0</span>
             </div>
         </div>
     </div>
 
-    <!-- TAB 2: MONEY FACTOR DISCOUNT METHOD -->
+    <!-- TAB 2: GENERAL OEM MONEY FACTOR DISCOUNT METHOD -->
     <div id="tabMf" class="tab-content">
         <div class="sum-card mf-theme">
-            <div class="label" style="color:#38bdf8;">Total One-Pay Lease Cost</div>
+            <div class="label" style="color:#38bdf8;">Total Due on Delivery (Inc. Tax)</div>
             <div class="val" id="mfTotalDue">$0</div>
-            <div class="sub" id="mfSub">Standard OEM Money Factor Model</div>
+            <div class="sub" id="mfSavingsSub">Total Interest Savings: $0</div>
         </div>
 
         <div class="card">
@@ -182,7 +182,7 @@
                 <span class="res-val text-sky" id="mfEffectiveVal">0.00000</span>
             </div>
             <div class="res-row">
-                <span class="res-label">Total Interest Savings vs Standard:</span>
+                <span class="res-label">Total Net Interest Savings:</span>
                 <span class="res-val text-sky" id="mfSavingsVal">$0</span>
             </div>
         </div>
@@ -221,42 +221,40 @@
 
             var totalSellingPrice = msrp + freight;
             var leaseEndValue = msrp * residualPct;
+            var baseDepreciation = totalSellingPrice - leaseEndValue;
 
-            // Standard Monthly Lease Baseline
+            // 1. Standard Lease Baseline Calculation
             var stdMF = stdRatePct / 2400;
-            var stdDep = (totalSellingPrice - leaseEndValue) / term;
+            var stdDep = baseDepreciation / term;
             var stdFin = (totalSellingPrice + leaseEndValue) * stdMF;
             var stdMonthlyWithTax = (stdDep + stdFin) * (1 + taxRate);
             var stdTotalLeaseCost = stdMonthlyWithTax * term;
 
-            // 1. RICHARD CHUNG PV FORMULA
-            // PV Factor = 1 / (1 + (Rate / 12)) ^ Term
-            var pvFactor = 1 / Math.pow(1 + (pvRatePct / 12), term);
-            // Net Cap Cost = Residual Value * PV Factor
-            var netCapCost = leaseEndValue * pvFactor;
-            // Pre-Tax One-Pay Total = Total Selling Price - Net Cap Cost
-            var pvPreTax = totalSellingPrice - netCapCost;
-            // Total Due on Delivery = Pre-Tax Total * (1 + Tax Rate)
-            var pvTotalDue = pvPreTax * (1 + taxRate);
+            // 2. Toyota / Lexus Discounted One-Pay Model
+            var pvMF = pvRatePct / 2400;
+            var pvFinCharge = (totalSellingPrice + leaseEndValue) * pvMF * term;
+            var pvTotalDue = (baseDepreciation + pvFinCharge) * (1 + taxRate);
+            var pvSavings = stdTotalLeaseCost - pvTotalDue;
 
-            // 2. Standard Money Factor Discount Method
+            // 3. Money Factor Reduction One-Pay Model (BMW/Audi/Others)
             var effectiveMF = Math.max(0, stdMF - mfDiscount);
-            var baseDepreciation = totalSellingPrice - leaseEndValue;
             var mfFinCharge = (totalSellingPrice + leaseEndValue) * effectiveMF * term;
             var mfTotalDue = (baseDepreciation + mfFinCharge) * (1 + taxRate);
             var mfSavings = stdTotalLeaseCost - mfTotalDue;
 
-            // Render PV Tab
+            // Render Tab 1 (Toyota / Lexus Model)
             document.getElementById('pvTotalDue').textContent = '$' + Math.round(pvTotalDue).toLocaleString();
+            document.getElementById('pvSavingsSub').textContent = 'Total Net Interest Savings: $' + Math.round(pvSavings).toLocaleString();
             document.getElementById('pvSellingPrice').textContent = '$' + totalSellingPrice.toLocaleString();
             document.getElementById('pvBaseResidual').textContent = '$' + leaseEndValue.toLocaleString();
-            document.getElementById('pvFactorVal').textContent = pvFactor.toFixed(6);
-            document.getElementById('pvNetCapVal').textContent = '$' + netCapCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('pvPreTaxVal').textContent = '$' + Math.round(pvPreTax).toLocaleString();
+            document.getElementById('pvBaseDep').textContent = '$' + baseDepreciation.toLocaleString();
             document.getElementById('pvStdTotal').textContent = '$' + Math.round(stdTotalLeaseCost).toLocaleString() + ' ($' + Math.round(stdMonthlyWithTax).toLocaleString() + '/mo)';
+            document.getElementById('pvFinChargeVal').textContent = '$' + Math.round(pvFinCharge * (1 + taxRate)).toLocaleString();
+            document.getElementById('pvSavingsVal').textContent = '$' + Math.round(pvSavings).toLocaleString();
 
-            // Render MF Tab
+            // Render Tab 2 (Money Factor Discount Model)
             document.getElementById('mfTotalDue').textContent = '$' + Math.round(mfTotalDue).toLocaleString();
+            document.getElementById('mfSavingsSub').textContent = 'Total Net Interest Savings: $' + Math.round(mfSavings).toLocaleString();
             document.getElementById('mfStdTotal').textContent = '$' + Math.round(stdTotalLeaseCost).toLocaleString();
             document.getElementById('mfStdMonthly').textContent = '$' + Math.round(stdMonthlyWithTax).toLocaleString() + '/mo';
             document.getElementById('mfEffectiveVal').textContent = effectiveMF.toFixed(5);
@@ -273,5 +271,3 @@
     </script>
 </body>
 </html>
-
-
