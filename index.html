@@ -191,7 +191,7 @@
             var leaseEndValue = msrp * residualPct;
             var baseDepreciation = totalSellingPrice - leaseEndValue;
 
-            // Standard Monthly Baseline
+            // Standard Monthly Baseline (Corrected for Total Term Cost)
             var stdMF = stdRatePct / 2400;
             var stdMonthlyDep = baseDepreciation / term;
             var stdMonthlyFin = (totalSellingPrice + leaseEndValue) * stdMF;
