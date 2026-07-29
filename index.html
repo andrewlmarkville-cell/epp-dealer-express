@@ -3,52 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPP Dealer Express | Executive One-Pay Engine</title>
+    <title>EPP Dealer Express | Unified One-Pay Engine</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
         body { background-color: #0f172a; color: #f8fafc; padding: 12px; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 12px; }
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 14px; }
         .logo-box { display: flex; align-items: center; gap: 8px; }
         .logo { font-size: 16px; font-weight: 900; color: #0f172a; background: #f59e0b; padding: 3px 7px; border-radius: 5px; }
         .title { font-size: 15px; font-weight: bold; color: #ffffff; }
         .author { font-size: 11px; color: #f59e0b; font-weight: 700; text-align: right; }
 
-        .tab-container { display: flex; gap: 8px; margin-bottom: 14px; }
-        .tab-btn { flex: 1; padding: 10px 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; font-size: 12px; font-weight: 700; border-radius: 8px; text-align: center; cursor: pointer; }
-        .tab-btn.active-pv { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #f59e0b; }
-        .tab-btn.active-mf { background: rgba(56, 189, 248, 0.15); border-color: #38bdf8; color: #38bdf8; }
-
+        /* Container & Summary Card */
         .container { display: flex; flex-direction: column; gap: 12px; }
-        
-        .sum-card { background: #1e293b; border: 1.5px solid #334155; padding: 14px; border-radius: 10px; text-align: center; }
-        .sum-card.pv-theme { border-color: #f59e0b; background: rgba(245, 158, 11, 0.08); }
-        .sum-card.mf-theme { border-color: #38bdf8; background: rgba(56, 189, 248, 0.08); }
-        .sum-card .label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
-        .sum-card .val { font-size: 24px; font-weight: 900; margin-top: 4px; }
-        .pv-theme .val { color: #f59e0b; }
-        .mf-theme .val { color: #38bdf8; }
-        .sum-card .sub { font-size: 11px; color: #cbd5e1; margin-top: 4px; font-weight: 600; }
+        .sum-card { background: rgba(245, 158, 11, 0.08); border: 1.5px solid #f59e0b; padding: 16px; border-radius: 12px; text-align: center; }
+        .sum-card .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .sum-card .val { font-size: 28px; font-weight: 900; color: #f59e0b; margin-top: 4px; }
+        .sum-card .sub { font-size: 12px; color: #38bdf8; margin-top: 4px; font-weight: 700; }
 
+        /* Input Cards */
         .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; }
-        .card-title { font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 10px; text-transform: uppercase; }
+        .card-title { font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .field { margin-bottom: 10px; }
         .field label { display: block; font-size: 11px; color: #cbd5e1; margin-bottom: 3px; }
         .field input, .field select { width: 100%; background-color: #0f172a; border: 1px solid #475569; color: #ffffff; padding: 8px 10px; border-radius: 6px; font-size: 14px; outline: none; }
+        .field input:focus, .field select:focus { border-color: #f59e0b; }
         
         .grid-2 { display: flex; gap: 10px; }
         .grid-2 > div { flex: 1; }
 
+        /* Breakdown Table */
         .res-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; }
         .res-row:last-child { border-bottom: none; }
         .res-label { color: #94a3b8; }
         .res-val { font-weight: bold; color: #f8fafc; }
         .text-gold { color: #f59e0b; }
         .text-sky { color: #38bdf8; }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: flex; flex-direction: column; gap: 12px; }
     </style>
 </head>
 <body>
@@ -61,151 +53,126 @@
         <div class="author">Andrew Lam</div>
     </div>
 
-    <div class="tab-container">
-        <div class="tab-btn active-pv" id="tabBtnPv" onclick="switchTab('pv')">Option 1: Discount Rate<br><span style="font-size:9px; font-weight:normal;">(Toyota / Lexus Model)</span></div>
-        <div class="tab-btn" id="tabBtnMf" onclick="switchTab('mf')">Option 2: MF Reduction<br><span style="font-size:9px; font-weight:normal;">(BMW / Audi / General OEM)</span></div>
-    </div>
+    <div class="container">
 
-    <div class="card">
-        <div class="card-title">Vehicle & Contract Parameters</div>
-        
-        <div class="field">
-            <label>Base Vehicle Price ($)</label>
-            <input type="number" id="msrp" value="60000">
+        <!-- TOP SUMMARY CARD -->
+        <div class="sum-card">
+            <div class="label">Total Due on Delivery (Inc. Tax)</div>
+            <div class="val" id="outTotalDue">$0</div>
+            <div class="sub" id="outSavingsSub">Total Interest Savings: $0</div>
         </div>
 
-        <div class="field">
-            <label>Freight, PDI & Fees ($)</label>
-            <input type="number" id="freight" value="2300">
-        </div>
-
-        <div class="grid-2">
+        <!-- VEHICLE & CONTRACT INPUTS -->
+        <div class="card">
+            <div class="card-title">1. Vehicle & Contract Parameters</div>
+            
             <div class="field">
-                <label>Lease Term</label>
-                <select id="term">
-                    <option value="24">24 Months</option>
-                    <option value="36" selected>36 Months</option>
-                    <option value="48">48 Months</option>
+                <label>Base Vehicle Price ($)</label>
+                <input type="number" id="msrp" value="60000">
+            </div>
+
+            <div class="field">
+                <label>Freight, PDI & Admin Fees ($)</label>
+                <input type="number" id="freight" value="2300">
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Lease Term</label>
+                    <select id="term">
+                        <option value="24">24 Months</option>
+                        <option value="36" selected>36 Months</option>
+                        <option value="48">48 Months</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Residual Value (%)</label>
+                    <input type="number" id="residual" value="58">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Standard Lease Rate (%)</label>
+                    <input type="number" id="stdRate" value="6.9" step="0.1">
+                </div>
+                <div class="field">
+                    <label>Sales Tax Rate (%)</label>
+                    <input type="number" id="taxRate" value="13" step="0.1">
+                </div>
+            </div>
+        </div>
+
+        <!-- ONE-PAY ADJUSTMENT ENGINE -->
+        <div class="card">
+            <div class="card-title">2. One-Pay Rate Adjustment</div>
+            
+            <div class="field">
+                <label>Adjustment Mode</label>
+                <select id="calcMode" onchange="toggleModeInput()">
+                    <option value="rate">Discounted Rate (%) — Toyota / Lexus / Subaru</option>
+                    <option value="mf">Money Factor Reduction (-MF) — BMW / Audi / German OEM</option>
                 </select>
             </div>
-            <div class="field">
-                <label>Residual Value (%)</label>
-                <input type="number" id="residual" value="58">
-            </div>
-        </div>
 
-        <div class="grid-2">
-            <div class="field">
-                <label>Standard Lease Rate (%)</label>
-                <input type="number" id="stdRate" value="6.9" step="0.1">
-            </div>
-            <div class="field">
-                <label>Sales Tax Rate (%)</label>
-                <input type="number" id="taxRate" value="13" step="0.1">
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 1: TOYOTA / LEXUS ONE-PAY METHOD -->
-    <div id="tabPv" class="tab-content active">
-        <div class="sum-card pv-theme">
-            <div class="label">Total Due on Delivery (Inc. Tax)</div>
-            <div class="val" id="pvTotalDue">$0</div>
-            <div class="sub" id="pvSavingsSub">Total Interest Savings: $0</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">1. One-Pay Rate Adjustment</div>
-            <div class="field">
+            <div class="field" id="rateInputGroup">
                 <label>Discounted One-Pay Rate (%)</label>
                 <input type="number" id="pvRate" value="3.9" step="0.1">
             </div>
-        </div>
 
-        <div class="card">
-            <div class="card-title">Side-By-Side Comparison</div>
-            <div class="res-row">
-                <span class="res-label">Total Selling Price:</span>
-                <span class="res-val" id="pvSellingPrice">$0</span>
-            </div>
-            <div class="res-row">
-                <span class="res-label">Residual Value:</span>
-                <span class="res-val" id="pvBaseResidual">$0</span>
-            </div>
-            <div class="res-row">
-                <span class="res-label">Base Vehicle Depreciation:</span>
-                <span class="res-val" id="pvBaseDep">$0</span>
-            </div>
-            <div class="res-row">
-                <span class="res-label">Standard Lease Total (36 Mos):</span>
-                <span class="res-val" id="pvStdTotal">$0</span>
-            </div>
-            <div class="res-row">
-                <span class="res-label">One-Pay Finance Charge (Inc. Tax):</span>
-                <span class="res-val text-gold" id="pvFinChargeVal">$0</span>
-            </div>
-            <div class="res-row">
-                <span class="res-label">Total Net Interest Savings:</span>
-                <span class="res-val text-gold" id="pvSavingsVal">$0</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 2: GENERAL OEM MONEY FACTOR DISCOUNT METHOD -->
-    <div id="tabMf" class="tab-content">
-        <div class="sum-card mf-theme">
-            <div class="label" style="color:#38bdf8;">Total Due on Delivery (Inc. Tax)</div>
-            <div class="val" id="mfTotalDue">$0</div>
-            <div class="sub" id="mfSavingsSub">Total Interest Savings: $0</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title" style="color:#38bdf8;">2. One-Pay Rate Adjustment</div>
-            <div class="field">
+            <div class="field" id="mfInputGroup" style="display: none;">
                 <label>MF Buy-Down (-MF Reduction)</label>
                 <input type="number" id="mfDiscount" value="0.00080" step="0.00005">
             </div>
         </div>
 
+        <!-- SIDE-BY-SIDE FINANCIAL BREAKDOWN -->
         <div class="card">
-            <div class="card-title" style="color:#38bdf8;">Side-By-Side Comparison</div>
+            <div class="card-title">Side-By-Side Breakdown</div>
+            
             <div class="res-row">
-                <span class="res-label">Standard Lease Total (Inc. Tax):</span>
-                <span class="res-val" id="mfStdTotal">$0</span>
+                <span class="res-label">Total Selling Price:</span>
+                <span class="res-val" id="outSellingPrice">$0</span>
             </div>
             <div class="res-row">
-                <span class="res-label">Standard Monthly Payment:</span>
-                <span class="res-val" id="mfStdMonthly">$0/mo</span>
+                <span class="res-label">Residual Value (100% Fixed):</span>
+                <span class="res-val" id="outResidual">$0</span>
             </div>
             <div class="res-row">
-                <span class="res-label">Discounted Money Factor:</span>
-                <span class="res-val text-sky" id="mfEffectiveVal">0.00000</span>
+                <span class="res-label">Upfront Base Depreciation:</span>
+                <span class="res-val" id="outBaseDep">$0</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label">Standard Lease Total Baseline:</span>
+                <span class="res-val" id="outStdTotal">$0</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label">Standard Monthly Equivalent:</span>
+                <span class="res-val" id="outStdMonthly">$0/mo</span>
+            </div>
+            <div class="res-row">
+                <span class="res-label">One-Pay Finance Charge (Inc. Tax):</span>
+                <span class="res-val text-gold" id="outOnePayFin">$0</span>
             </div>
             <div class="res-row">
                 <span class="res-label">Total Net Interest Savings:</span>
-                <span class="res-val text-sky" id="mfSavingsVal">$0</span>
+                <span class="res-val text-sky" id="outSavingsVal">$0</span>
             </div>
         </div>
+
     </div>
 
     <script>
-        function switchTab(type) {
-            var tabPv = document.getElementById('tabPv');
-            var tabMf = document.getElementById('tabMf');
-            var btnPv = document.getElementById('tabBtnPv');
-            var btnMf = document.getElementById('tabBtnMf');
-
-            if (type === 'pv') {
-                tabPv.classList.add('active');
-                tabMf.classList.remove('active');
-                btnPv.className = 'tab-btn active-pv';
-                btnMf.className = 'tab-btn';
+        function toggleModeInput() {
+            var mode = document.getElementById('calcMode').value;
+            if (mode === 'rate') {
+                document.getElementById('rateInputGroup').style.display = 'block';
+                document.getElementById('mfInputGroup').style.display = 'none';
             } else {
-                tabMf.classList.add('active');
-                tabPv.classList.remove('active');
-                btnPv.className = 'tab-btn';
-                btnMf.className = 'tab-btn active-mf';
+                document.getElementById('rateInputGroup').style.display = 'none';
+                document.getElementById('mfInputGroup').style.display = 'block';
             }
+            runCalc();
         }
 
         function runCalc() {
@@ -216,6 +183,7 @@
             var stdRatePct = (parseFloat(document.getElementById('stdRate').value) || 0) / 100;
             var taxRate = (parseFloat(document.getElementById('taxRate').value) || 0) / 100;
             
+            var mode = document.getElementById('calcMode').value;
             var pvRatePct = (parseFloat(document.getElementById('pvRate').value) || 0) / 100;
             var mfDiscount = parseFloat(document.getElementById('mfDiscount').value) || 0;
 
@@ -223,42 +191,35 @@
             var leaseEndValue = msrp * residualPct;
             var baseDepreciation = totalSellingPrice - leaseEndValue;
 
-            // 1. Standard Lease Baseline Calculation
+            // Standard Monthly Baseline
             var stdMF = stdRatePct / 2400;
-            var stdDep = baseDepreciation / term;
-            var stdFin = (totalSellingPrice + leaseEndValue) * stdMF;
-            var stdMonthlyWithTax = (stdDep + stdFin) * (1 + taxRate);
+            var stdMonthlyDep = baseDepreciation / term;
+            var stdMonthlyFin = (totalSellingPrice + leaseEndValue) * stdMF;
+            var stdMonthlyWithTax = (stdMonthlyDep + stdMonthlyFin) * (1 + taxRate);
             var stdTotalLeaseCost = stdMonthlyWithTax * term;
 
-            // 2. Toyota / Lexus Discounted One-Pay Model
-            var pvMF = pvRatePct / 2400;
-            var pvFinCharge = (totalSellingPrice + leaseEndValue) * pvMF * term;
-            var pvTotalDue = (baseDepreciation + pvFinCharge) * (1 + taxRate);
-            var pvSavings = stdTotalLeaseCost - pvTotalDue;
+            // One-Pay Finance Calculation
+            var effectiveMF = 0;
+            if (mode === 'rate') {
+                effectiveMF = pvRatePct / 2400;
+            } else {
+                effectiveMF = Math.max(0, stdMF - mfDiscount);
+            }
 
-            // 3. Money Factor Reduction One-Pay Model (BMW/Audi/Others)
-            var effectiveMF = Math.max(0, stdMF - mfDiscount);
-            var mfFinCharge = (totalSellingPrice + leaseEndValue) * effectiveMF * term;
-            var mfTotalDue = (baseDepreciation + mfFinCharge) * (1 + taxRate);
-            var mfSavings = stdTotalLeaseCost - mfTotalDue;
+            var onePayFinCharge = (totalSellingPrice + leaseEndValue) * effectiveMF * term;
+            var totalDueOnDelivery = (baseDepreciation + onePayFinCharge) * (1 + taxRate);
+            var totalSavings = stdTotalLeaseCost - totalDueOnDelivery;
 
-            // Render Tab 1 (Toyota / Lexus Model)
-            document.getElementById('pvTotalDue').textContent = '$' + Math.round(pvTotalDue).toLocaleString();
-            document.getElementById('pvSavingsSub').textContent = 'Total Net Interest Savings: $' + Math.round(pvSavings).toLocaleString();
-            document.getElementById('pvSellingPrice').textContent = '$' + totalSellingPrice.toLocaleString();
-            document.getElementById('pvBaseResidual').textContent = '$' + leaseEndValue.toLocaleString();
-            document.getElementById('pvBaseDep').textContent = '$' + baseDepreciation.toLocaleString();
-            document.getElementById('pvStdTotal').textContent = '$' + Math.round(stdTotalLeaseCost).toLocaleString() + ' ($' + Math.round(stdMonthlyWithTax).toLocaleString() + '/mo)';
-            document.getElementById('pvFinChargeVal').textContent = '$' + Math.round(pvFinCharge * (1 + taxRate)).toLocaleString();
-            document.getElementById('pvSavingsVal').textContent = '$' + Math.round(pvSavings).toLocaleString();
-
-            // Render Tab 2 (Money Factor Discount Model)
-            document.getElementById('mfTotalDue').textContent = '$' + Math.round(mfTotalDue).toLocaleString();
-            document.getElementById('mfSavingsSub').textContent = 'Total Net Interest Savings: $' + Math.round(mfSavings).toLocaleString();
-            document.getElementById('mfStdTotal').textContent = '$' + Math.round(stdTotalLeaseCost).toLocaleString();
-            document.getElementById('mfStdMonthly').textContent = '$' + Math.round(stdMonthlyWithTax).toLocaleString() + '/mo';
-            document.getElementById('mfEffectiveVal').textContent = effectiveMF.toFixed(5);
-            document.getElementById('mfSavingsVal').textContent = '$' + Math.round(mfSavings).toLocaleString();
+            // Output Values
+            document.getElementById('outTotalDue').textContent = '$' + Math.round(totalDueOnDelivery).toLocaleString();
+            document.getElementById('outSavingsSub').textContent = 'Total Net Interest Savings: $' + Math.round(totalSavings).toLocaleString();
+            document.getElementById('outSellingPrice').textContent = '$' + totalSellingPrice.toLocaleString();
+            document.getElementById('outResidual').textContent = '$' + leaseEndValue.toLocaleString();
+            document.getElementById('outBaseDep').textContent = '$' + baseDepreciation.toLocaleString();
+            document.getElementById('outStdTotal').textContent = '$' + Math.round(stdTotalLeaseCost).toLocaleString();
+            document.getElementById('outStdMonthly').textContent = '$' + Math.round(stdMonthlyWithTax).toLocaleString() + '/mo';
+            document.getElementById('outOnePayFin').textContent = '$' + Math.round(onePayFinCharge * (1 + taxRate)).toLocaleString();
+            document.getElementById('outSavingsVal').textContent = '$' + Math.round(totalSavings).toLocaleString();
         }
 
         var inputs = document.querySelectorAll('input, select');
