@@ -313,6 +313,7 @@
                 freightField.style.display = 'block';
                 sumLabel.textContent = 'One-Pay Total Due on Delivery (Closed-End Lease)';
                 lblMsrp.textContent = 'Base Vehicle Price ($)';
+                recalculateEngine();
             } else {
                 tabUsed.className = 'tab-btn active';
                 matrixContainer.style.display = 'none';
@@ -325,8 +326,8 @@
                 document.getElementById('msrp').value = '28000';
                 document.getElementById('residual').value = '50';
                 document.getElementById('activeRate').value = '7.99';
+                recalculateEngine();
             }
-            handleDealTypeChange();
         }
 
         function loadVehicleProfile() {
@@ -375,5 +376,4 @@
         }
 
         function handleDealTypeChange() {
-            if (currentTab === 'used') {
-                recalculate
+            if (currentTab ===
