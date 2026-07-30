@@ -32,7 +32,6 @@
         .res-val { font-weight: bold; color: #f8fafc; }
         .text-gold { color: #f59e0b; }
         .text-sky { color: #38bdf8; }
-        .text-green { color: #4ade80; }
     </style>
 </head>
 <body>
@@ -52,13 +51,13 @@
             <div class="val" id="outTotal">$0</div>
         </div>
 
-        <!-- Captive Brand Rate Presets -->
+        <!-- Pre-Paid Lease Rate Presets -->
         <div class="card">
-            <div class="card-title">Brand Rate Presets (Standard / Pre-Paid)</div>
+            <div class="card-title">Pre-Paid Lease Discount Rate Presets</div>
             <div class="preset-bar">
-                <button class="preset-btn" type="button" onclick="setPreset(6.9, 2.49)">Toyota (6.9% / 2.49%)</button>
-                <button class="preset-btn" type="button" onclick="setPreset(6.2, 3.49)">Lexus (6.2% / 3.49%)</button>
-                <button class="preset-btn" type="button" onclick="setPreset(6.49, 2.29)">Subaru (6.49% / 2.29%)</button>
+                <button class="preset-btn" type="button" onclick="setRate(2.49)">Toyota (2.49%)</button>
+                <button class="preset-btn" type="button" onclick="setRate(3.49)">Lexus (3.49%)</button>
+                <button class="preset-btn" type="button" onclick="setRate(2.29)">Subaru (2.29%)</button>
             </div>
         </div>
 
@@ -110,39 +109,31 @@
                     <input type="number" id="inpResidual" value="58" oninput="runCalc()">
                 </div>
                 <div class="field">
-                    <label>Standard Bulletin Rate (%)</label>
-                    <input type="number" id="inpStdRate" value="6.9" step="0.01" oninput="runCalc()">
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div class="field">
                     <label>Pre-Paid Lease Rate (%)</label>
                     <input type="number" id="inpRate" value="2.49" step="0.01" oninput="runCalc()">
                 </div>
-                <div class="field">
-                    <label>Sales Tax Rate (%)</label>
-                    <input type="number" id="inpTax" value="13" step="0.1" oninput="runCalc()">
-                </div>
+            </div>
+
+            <div class="field">
+                <label>Sales Tax Rate (%)</label>
+                <input type="number" id="inpTax" value="13" step="0.1" oninput="runCalc()">
             </div>
         </div>
 
         <!-- Financial Breakdown -->
         <div class="card">
-            <div class="card-title">Financial Breakdown & Rate Savings</div>
+            <div class="card-title">Financial Breakdown</div>
             <div class="res-row"><span class="res-label">Gross Capitalized Cost:</span><span class="res-val" id="resGrossCap">$0</span></div>
             <div class="res-row"><span class="res-label">Net Capitalized Cost:</span><span class="res-val text-sky" id="resNetCap">$0</span></div>
             <div class="res-row"><span class="res-label">Residual Value (LEV):</span><span class="res-val" id="resResidual">$0</span></div>
-            <div class="res-row"><span class="res-label">Standard Interest Cost:</span><span class="res-val" id="resStdInterest">$0</span></div>
-            <div class="res-row"><span class="res-label">Pre-Paid Total Due:</span><span class="res-val text-gold" id="resPrepaidTotal">$0</span></div>
-            <div class="res-row"><span class="res-label">Total Interest Saved:</span><span class="res-val text-green" id="resSavings">+$0</span></div>
+            <div class="res-row"><span class="res-label">Base Depreciation:</span><span class="res-val" id="resDep">$0</span></div>
+            <div class="res-row"><span class="res-label">Total Finance Charge (Inc. Tax):</span><span class="res-val text-gold" id="resFinCharge">$0</span></div>
         </div>
     </div>
 
     <script>
-        function setPreset(std, pre) {
-            document.getElementById('inpStdRate').value = std;
-            document.getElementById('inpRate').value = pre;
+        function setRate(rateVal) {
+            document.getElementById('inpRate').value = rateVal;
             runCalc();
         }
 
@@ -154,7 +145,6 @@
             var trade = parseFloat(document.getElementById('inpTrade').value) || 0;
             var term = parseInt(document.getElementById('inpTerm').value) || 36;
             var resPct = (parseFloat(document.getElementById('inpResidual').value) || 0) / 100;
-            var stdRate = parseFloat(document.getElementById('inpStdRate').value) || 0;
             var rate = parseFloat(document.getElementById('inpRate').value) || 0;
             var tax = (parseFloat(document.getElementById('inpTax').value) || 0) / 100;
 
@@ -163,25 +153,16 @@
             var residualVal = price * resPct;
             var depreciation = Math.max(0, netCap - residualVal);
             
-            // Standard Rate Interest Calculation (with tax)
-            var stdMF = stdRate / 2400;
-            var stdFinCharge = (netCap + residualVal) * stdMF * term;
-            var stdTotalDue = (depreciation + stdFinCharge) * (1 + tax);
-
-            // Pre-Paid Rate Calculation (with tax)
             var mf = rate / 2400;
             var finCharge = (netCap + residualVal) * mf * term;
             var totalDue = (depreciation + finCharge) * (1 + tax);
-
-            var totalSavings = Math.max(0, stdTotalDue - totalDue);
 
             document.getElementById('outTotal').textContent = '$' + Math.round(totalDue).toLocaleString();
             document.getElementById('resGrossCap').textContent = '$' + Math.round(grossCap).toLocaleString();
             document.getElementById('resNetCap').textContent = '$' + Math.round(netCap).toLocaleString();
             document.getElementById('resResidual').textContent = '$' + Math.round(residualVal).toLocaleString();
-            document.getElementById('resStdInterest').textContent = '$' + Math.round(stdFinCharge * (1 + tax)).toLocaleString();
-            document.getElementById('resPrepaidTotal').textContent = '$' + Math.round(totalDue).toLocaleString();
-            document.getElementById('resSavings').textContent = '+$' + Math.round(totalSavings).toLocaleString();
+            document.getElementById('resDep').textContent = '$' + Math.round(depreciation).toLocaleString();
+            document.getElementById('resFinCharge').textContent = '$' + Math.round(finCharge * (1 + tax)).toLocaleString();
         }
 
         // Initialize calculation on load
@@ -189,4 +170,3 @@
     </script>
 </body>
 </html>
-
