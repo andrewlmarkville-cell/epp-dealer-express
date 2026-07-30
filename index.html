@@ -1,1 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPP Dealer Express | Direct One-Pay</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; padding: 12px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 14px; }
+        .logo { font-size: 16px; font-weight: 900; color: #0f172a; background: #f59e0b; padding: 3px 7px; border-radius: 5px; }
+        .title { font-size: 15px; font-weight: bold; color: #ffffff; }
+        .author { font-size: 11px; color: #f59e0b; font-weight: 700; }
+        .container { display: flex; flex-direction: column; gap: 12px; }
+        .sum-card { background: rgba(245, 158, 11, 0.08); border: 1.5px solid #f59e0b; padding: 16px; border-radius: 12px; text-align: center; }
+        .sum-card .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+        .sum-card .val { font-size: 28px; font-weight: 900; color: #f59e0b; margin-top: 4px; }
+        .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; }
+        .card-title { font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 10px; text-transform: uppercase; }
+        .field { margin-bottom: 10px; }
+        .field label { display: block; font-size: 11px; color: #cbd5e1; margin-bottom: 3px; }
+        .field input, .field select { width: 100%; background-color: #0f172a; border: 1px solid #475569; color: #ffffff; padding: 8px 10px; border-radius: 6px; font-size: 14px; outline: none; }
+        .field input:focus, .field select:focus { border-color: #f59e0b; }
+        .grid-2 { display: flex; gap: 10px; }
+        .grid-2 > div { flex: 1; }
+        .preset-bar { display: flex; gap: 6px; margin-bottom: 10px; }
+        .preset-btn { flex: 1; background: #334155; border: none; color: #f8fafc; padding: 6px; font-size: 11px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .preset-btn:hover { background: #f59e0b; color: #0f172a; }
+        .res-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; }
+        .res-row:last-child { border-bottom: none; }
+        .res-label { color: #94a3b8; }
+        .res-val { font-weight: bold; color: #f8fafc; }
+        .text-gold { color: #f59e0b; }
+        .text-sky { color: #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="logo">EPP</span>
+            <span class="title">Dealer Express | Direct One-Pay</span>
+        </div>
+        <span class="author">Andrew Lam</span>
+    </div>
+
+    <div class="container">
+        <!-- Summary Box -->
+        <div class="sum-card">
+            <div class="label">One-Pay Total Due on Delivery</div>
+            <div class="val" id="outTotal">$0</div>
+        </div>
+
+        <!-- Pre-Paid Lease Rate Presets -->
+        <div class="card">
+            <div class="card-title">Pre-Paid Lease Discount Rate Presets</div>
+            <div class="preset-bar">
+                <button class="preset-btn" type="button" onclick="setRate(2.49)">Toyota (2.49%)</button>
+                <button class="preset-btn" type="button" onclick="setRate(3.49)">Lexus (3.49%)</button>
+                <button class="preset-btn" type="button" onclick="setRate(2.29)">Subaru (2.29%)</button>
+            </div>
+        </div>
+
+        <!-- Deal Parameters -->
+        <div class="card">
+            <div class="card-title">Deal Parameters & Pricing</div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Lease Term (Months)</label>
+                    <select id="inpTerm" onchange="runCalc()">
+                        <option value="24">24 Months</option>
+                        <option value="36" selected>36 Months</option>
+                        <option value="48">48 Months</option>
+                        <option value="60">60 Months</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Selling Price / MSRP ($)</label>
+                    <input type="number" id="inpPrice" value="38000" oninput="runCalc()">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Freight & Fees ($)</label>
+                    <input type="number" id="inpFreight" value="2300" oninput="runCalc()">
+                </div>
+                <div class="field">
+                    <label>Accessories / Add-ons ($)</label>
+                    <input type="number" id="inpAddons" value="0" oninput="runCalc()">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Cash Incentive / Rebate ($)</label>
+                    <input type="number" id="inpIncentive" value="0" oninput="runCalc()">
+                </div>
+                <div class="field">
+                    <label>Trade Equity ($)</label>
+                    <input type="number" id="inpTrade" value="0" oninput="runCalc()">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Residual Value (%)</label>
+                    <input type="number" id="inpResidual" value="58" oninput="runCalc()">
+                </div>
+                <div class="field">
+                    <label>Pre-Paid Lease Rate (%)</label>
+                    <input type="number" id="inpRate" value="2.49" step="0.01" oninput="runCalc()">
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Sales Tax Rate (%)</label>
+                <input type="number" id="inpTax" value="13" step="0.1" oninput="runCalc()">
+            </div>
+        </div>
+
+        <!-- Financial Breakdown -->
+        <div class="card">
+            <div class="card-title">Financial Breakdown</div>
+            <div class="res-row"><span class="res-label">Gross Capitalized Cost:</span><span class="res-val" id="resGrossCap">$0</span></div>
+            <div class="res-row"><span class="res-label">Net Capitalized Cost:</span><span class="res-val text-sky" id="resNetCap">$0</span></div>
+            <div class="res-row"><span class="res-label">Residual Value (LEV):</span><span class="res-val" id="resResidual">$0</span></div>
+            <div class="res-row"><span class="res-label">Base Depreciation:</span><span class="res-val" id="resDep">$0</span></div>
+            <div class="res-row"><span class="res-label">Total Finance Charge (Inc. Tax):</span><span class="res-val text-gold" id="resFinCharge">$0</span></div>
+        </div>
+    </div>
+
+    <script>
+        function setRate(rateVal) {
+            document.getElementById('inpRate').value = rateVal;
+            runCalc();
+        }
+
+        function runCalc() {
+            var price = parseFloat(document.getElementById('inpPrice').value) || 0;
+            var freight = parseFloat(document.getElementById('inpFreight').value) || 0;
+            var addons = parseFloat(document.getElementById('inpAddons').value) || 0;
+            var incentive = parseFloat(document.getElementById('inpIncentive').value) || 0;
+            var trade = parseFloat(document.getElementById('inpTrade').value) || 0;
+            var term = parseInt(document.getElementById('inpTerm').value) || 36;
+            var resPct = (parseFloat(document.getElementById('inpResidual').value) || 0) / 100;
+            var rate = parseFloat(document.getElementById('inpRate').value) || 0;
+            var tax = (parseFloat(document.getElementById('inpTax').value) || 0) / 100;
+
+            var grossCap = price + freight + addons;
+            var netCap = Math.max(0, grossCap - incentive - trade);
+            var residualVal = price * resPct;
+            var depreciation = Math.max(0, netCap - residualVal);
+            
+            var mf = rate / 2400;
+            var finCharge = (netCap + residualVal) * mf * term;
+            var totalDue = (depreciation + finCharge) * (1 + tax);
+
+            document.getElementById('outTotal').textContent = '$' + Math.round(totalDue).toLocaleString();
+            document.getElementById('resGrossCap').textContent = '$' + Math.round(grossCap).toLocaleString();
+            document.getElementById('resNetCap').textContent = '$' + Math.round(netCap).toLocaleString();
+            document.getElementById('resResidual').textContent = '$' + Math.round(residualVal).toLocaleString();
+            document.getElementById('resDep').textContent = '$' + Math.round(depreciation).toLocaleString();
+            document.getElementById('resFinCharge').textContent = '$' + Math.round(finCharge * (1 + tax)).toLocaleString();
+        }
+
+        // Initialize calculation on load
+        runCalc();
+    </script>
+</body>
+</html>
 
