@@ -1,1 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPP Dealer Express | Clean Master App</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; padding: 12px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 14px; }
+        .logo-box { display: flex; align-items: center; gap: 8px; }
+        .logo { font-size: 16px; font-weight: 900; color: #0f172a; background: #f59e0b; padding: 3px 7px; border-radius: 5px; }
+        .title { font-size: 15px; font-weight: bold; color: #ffffff; }
+        .author { font-size: 11px; color: #f59e0b; font-weight: 700; text-align: right; }
 
+        .tab-bar { display: flex; gap: 4px; margin-bottom: 14px; background: #1e293b; padding: 4px; border-radius: 8px; border: 1px solid #334155; }
+        .tab-btn { flex: 1; background: transparent; border: none; color: #94a3b8; padding: 10px 6px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; transition: all 0.2s ease; }
+        .tab-btn.active { background: #f59e0b; color: #0f172a; }
+
+        .container { display: flex; flex-direction: column; gap: 12px; }
+        .sum-card { background: rgba(245, 158, 11, 0.08); border: 1.5px solid #f59e0b; padding: 16px; border-radius: 12px; text-align: center; }
+        .sum-card .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .sum-card .val { font-size: 28px; font-weight: 900; color: #f59e0b; margin-top: 4px; }
+        .sum-card .sub { font-size: 12px; color: #38bdf8; margin-top: 4px; font-weight: 700; }
+
+        .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; }
+        .card-title { font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .field { margin-bottom: 10px; }
+        .field label { display: block; font-size: 11px; color: #cbd5e1; margin-bottom: 3px; }
+        .field input, .field select { width: 100%; background-color: #0f172a; border: 1px solid #475569; color: #ffffff; padding: 8px 10px; border-radius: 6px; font-size: 14px; outline: none; }
+        .field input:focus, .field select:focus { border-color: #f59e0b; }
+        
+        .checkbox-field { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 11px; color: #38bdf8; cursor: pointer; }
+        .checkbox-field input { width: auto; cursor: pointer; }
+
+        .grid-2 { display: flex; gap: 10px; }
+        .grid-2 > div { flex: 1; }
+
+        .res-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; }
+        .res-row:last-child { border-bottom: none; }
+        .res-label { color: #94a3b8; }
+        .res-val { font-weight: bold; color: #f8fafc; }
+        .text-gold { color: #f59e0b; }
+        .text-sky { color: #38bdf8; }
+        .text-green { color: #4ade80; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-box">
+            <span class="logo">EPP</span>
+            <span class="title">Dealer Express | Clean Master</span>
+        </div>
+        <div class="author">Andrew Lam</div>
+    </div>
+
+    <!-- 3-Tab Bar -->
+    <div class="tab-bar">
+        <button class="tab-btn active" id="btnMatrix" type="button" onclick="changeTab('matrix')">📊 New Matrix</button>
+        <button class="tab-btn" id="btnManual" type="button" onclick="changeTab('manual')">✍️ New Manual</button>
+        <button class="tab-btn" id="btnUsed" type="button" onclick="changeTab('used')">🚗 Used Lease</button>
+    </div>
+
+    <div class="container">
+
+        <!-- Summary Card -->
+        <div class="sum-card">
+            <div class="label" id="lblMainSum">One-Pay Total Due on Delivery</div>
+            <div class="val" id="outTotal">$0</div>
+            <div class="sub" id="outSub">Total Net Financial Advantage: $0</div>
+        </div>
+
+        <!-- Section 1: Vehicle & Terms -->
+        <div class="card">
+            <div class="card-title" id="sec1Title">1. Vehicle Profile & Terms</div>
+            
+            <div class="field" id="wrapMatrixSelect">
+                <label>Select Vehicle Model</label>
+                <select id="selVehicle" onchange="onVehicleSelect()">
+                    <option value="rav4">2026 Toyota RAV4 LE (MSRP: $38,000)</option>
+                    <option value="camry">2026 Toyota Camry SE (MSRP: $36,500)</option>
+                    <option value="nx">2026 Lexus NX 350 (MSRP: $58,000)</option>
+                    <option value="outback">2026 Subaru Outback (MSRP: $41,500)</option>
+                </select>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Lease Term</label>
+                    <select id="selTerm" onchange="calculate()">
+                        <option value="24">24 Months</option>
+                        <option value="36" selected>36 Months</option>
+                        <option value="48">48 Months</option>
+                        <option value="60">60 Months</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label id="lblPrice">Base Price / MSRP ($)</label>
+                    <input type="number" id="inpPrice" value="38000" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="grid-2" id="freightRow">
+                <div class="field">
+                    <label>Freight & Fees ($)</label>
+                    <input type="number" id="inpFreight" value="2300" oninput="calculate()">
+                </div>
+                <div class="field">
+                    <label>Residual Value (%)</label>
+                    <input type="number" id="inpResidual" value="58" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Cash Incentive ($)</label>
+                    <input type="number" id="inpIncentive" value="0" oninput="calculate()">
+                </div>
+                <div class="field">
+                    <label>Trade Equity ($)</label>
+                    <input type="number" id="inpTrade" value="0" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Lease Rate (%)</label>
+                    <input type="number" id="inpRate" value="6.9" step="0.01" oninput="calculate()">
+                </div>
+                <div class="field">
+                    <label>Sales Tax Rate (%)</label>
+                    <input type="number" id="inpTax" value="13" step="0.1" oninput="calculate()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Deal Structure (New Cars Only) -->
+        <div class="card" id="cardDealType">
+            <div class="card-title">2. Deal Structure & Rate Reduction</div>
+            <div class="field">
+                <label>Deal Type</label>
+                <select id="selDealType" onchange="onDealTypeChange()">
+                    <option value="standard" selected>Standard Retail (Discounted One-Pay Rate)</option>
+                    <option value="subvented">Subvented Promo (Rate Reduction)</option>
+                </select>
+            </div>
+            <div class="field" id="fieldStdRate">
+                <label>Discounted One-Pay Rate (%)</label>
+                <input type="number" id="inpPvRate" value="3.9" step="0.1" oninput="calculate()">
+            </div>
+            <div class="field" id="fieldSubRate" style="display: none;">
+                <label>OEM Rate Reduction (-%)</label>
+                <input type="number" id="inpRateDiscount" value="1.0" step="0.1" oninput="calculate()">
+            </div>
+        </div>
+
+        <!-- Section 3: F&I Products -->
+        <div class="card">
+            <div class="card-title">3. Protection Products & Accessories ($)</div>
+            <div class="grid-2">
+                <div class="field">
+                    <label>Extended Warranty ($)</label>
+                    <input type="number" id="pWarranty" value="0" oninput="calculate()">
+                </div>
+                <div class="field">
+                    <label>Tires & Rims ($)</label>
+                    <input type="number" id="pTires" value="0" oninput="calculate()">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="field">
+                    <label>Chemical & MISC ($)</label>
+                    <input type="number" id="pChemical" value="0" oninput="calculate()">
+                </div>
+                <div class="field">
+                    <label>Pre-Paid Maintenance ($)</label>
+                    <input type="number" id="pMaint" value="0" oninput="calculate()">
+                    <label class="checkbox-field">
+                        <input type="checkbox" id="chkResMaint" onchange="calculate()"> Residualize this item
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: GIC Strategy (New Cars Only) -->
+        <div class="card" id="cardGic">
+            <div class="card-title">4. Cash Buyer GIC Strategy</div>
+            <div class="field">
+                <label>Expected GIC Interest Rate (%)</label>
+                <input type="number" id="inpGic" value="4.5" step="0.1" oninput="calculate()">
+            </div>
+        </div>
+
+        <!-- Section 5: Financial Breakdown -->
+        <div class="card">
+            <div class="card-title">Financial Breakdown</div>
+            <div class="res-row"><span class="res-label">Net Cap Cost:</span><span class="res-val text-sky" id="resNetCap">$0</span></div>
+            <div class="res-row"><span class="res-label">Residual Value (LEV):</span><span class="res-val" id="resResidual">$0</span></div>
+            <div class="res-row"><span class="res-label">Effective Lease Rate:</span><span class="res-val text-gold" id="resEffRate">0%</span></div>
+            <div class="res-row" id="rowCash"><span class="res-label">Outright Cash Price (Inc. Tax):</span><span class="res-val" id="resCash">$0</span></div>
+            <div class="res-row" id="rowGicAmt"><span class="res-label">Cash Invested in GIC:</span><span class="res-val text-sky" id="resGicAmt">$0</span></div>
+            <div class="res-row" id="rowGicYield"><span class="res-label">GIC Interest Return:</span><span class="res-val text-green" id="resGicYield">+$0</span></div>
+            <div class="res-row" id="rowSavings"><span class="res-label">Lease Interest Savings:</span><span class="res-val text-sky" id="resSavings">$0</span></div>
+            <div class="res-row" id="rowAdvantage"><span class="res-label">Total Net Advantage:</span><span class="res-val text-green" id="resAdvantage">+$0</span></div>
+        </div>
+
+    </div>
+
+    <script>
+        var activeTab = 'matrix';
+
+        var db = {
+            "rav4": { msrp: 38000, data: { "24": { std: 6.9, sub: 1.99, res: 64 }, "36": { std: 6.9, sub: 2.49, res: 58 }, "48": { std: 7.4, sub: 3.49, res: 50 }, "60": { std: 7.4, sub: 3.99, res: 42 } } },
+            "camry": { msrp: 36500, data: { "24": { std: 5.9, sub: 0.99, res: 62 }, "36": { std: 5.9, sub: 1.49, res: 56 }, "48": { std: 6.4, sub: 2.49, res: 48 }, "60": { std: 6.4, sub: 2.99, res: 40 } } },
+            "nx": { msrp: 58000, data: { "24": { std: 6.2, sub: 2.99, res: 65 }, "36": { std: 6.2, sub: 3.49, res: 59 }, "48": { std: 6.7, sub: 3.99, res: 51 }, "60": { std: 6.7, sub: 4.49, res: 43 } } },
+            "outback": { msrp: 41500, data: { "24": { std: 6.49, sub: 1.99, res: 60 }, "36": { std: 6.49, sub: 2.29, res: 54 }, "48": { std: 6.99, sub: 2.99, res: 46 }, "60": { std: 6.99, sub: 3.49, res: 38 } } }
+        };
+
+        function changeTab(tab) {
+            activeTab = tab;
+            document.getElementById('btnMatrix').className = 'tab-btn' + (tab === 'matrix' ? ' active' : '');
+            document.getElementById('btnManual').className = 'tab-btn' + (tab === 'manual' ? ' active' : '');
+            document.getElementById('btnUsed').className = 'tab-btn' + (tab === 'used' ? ' active' : '');
+
+            var matrixSel = document.getElementById('wrapMatrixSelect');
+            var dealCard = document.getElementById('cardDealType');
+            var gicCard = document.getElementById('cardGic');
+            var freightRow = document.getElementById('freightRow');
+            var lblSum = document.getElementById('lblMainSum');
+            var lblPrice = document.getElementById('lblPrice');
+
+            if (tab === 'matrix') {
+                matrixSel.style.display = 'block';
+                dealCard.style.display = 'block';
+                gicCard.style.display = 'block';
+                freightRow.style.display = 'flex';
+                lblSum.textContent = 'One-Pay Total Due on Delivery';
+                lblPrice.textContent = 'Base Price / MSRP ($)';
+                onVehicleSelect();
+            } else if (tab === 'manual') {
+                matrixSel.style.display = 'none';
+                dealCard.style.display = 'block';
+                gicCard.style.display = 'block';
+                freightRow.style.display = 'flex';
+                lblSum.textContent = 'One-Pay Total Due on Delivery';
+                lblPrice.textContent = 'Base Vehicle Price ($)';
+                calculate();
+            } else {
+                matrixSel.style.display = 'none';
+                dealCard.style.display = 'none';
+                gicCard.style.display = 'none';
+                freightRow.style.display = 'none';
+                lblSum.textContent = 'Standard Monthly Lease Payment';
+                lblPrice.textContent = 'Used Vehicle Selling Price ($)';
+                document.getElementById('inpPrice').value = '28000';
+                document.getElementById('inpResidual').value = '50';
+                document.getElementById('inpRate').value = '7.99';
+                calculate();
+            }
+        }
+
+        function onVehicleSelect() {
+            if (activeTab !== 'matrix') return;
+            var key = document.getElementById('selVehicle').value;
+            var term = document.getElementById('selTerm').value;
+            var item = db[key];
+            if (item && item.data[term]) {
+                document.getElementById('inpPrice').value = item.msrp;
+                document.getElementById('inpResidual').value = item.data[term].res;
+                window.stdRate = item.data[term].std;
+                window.subRate = item.data[term].sub;
+                updateRates();
+            }
+            calculate();
+        }
+
+        function onDealTypeChange() {
+            var dtype = document.getElementById('selDealType').value;
+            document.getElementById('fieldStdRate').style.display = (dtype === 'standard') ? 'block' : 'none';
+            document.getElementById('fieldSubRate').style.display = (dtype === 'subvented') ? 'block' : 'none';
+            if (activeTab === 'matrix') updateRates();
+            calculate();
+        }
+
+        function updateRates() {
+            var dtype = document.getElementById('selDealType').value;
+            if (window.stdRate !== undefined) {
+                document.getElementById('inpRate').value = (dtype === 'standard') ? window.stdRate : window.subRate;
+            }
+        }
+
+        function calculate() {
+            var price = parseFloat(document.getElementById('inpPrice').value) || 0;
+            var freight = (activeTab === 'used') ? 0 : (parseFloat(document.getElementById('inpFreight').value) || 0);
+            var term = parseInt(document.getElementById('selTerm').value) || 36;
+            var resPct = (parseFloat(document.getElementById('inpResidual').value) || 0) / 100;
+            var incentive = parseFloat(document.getElementById('inpIncentive').value) || 0;
+            var trade = parseFloat(document.getElementById('inpTrade').value) || 0;
+            var baseRate = parseFloat(document.getElementById('inpRate').value) || 0;
+            var tax = (parseFloat(document.getElementById('inpTax').value) || 0) / 100;
+            var gicRate = (parseFloat(document.getElementById('inpGic').value) || 0) / 100;
+
+            var w = parseFloat(document.getElementById('pWarranty').value) || 0;
+            var t = parseFloat(document.getElementById('pTires').value) || 0;
+            var c = parseFloat(document.getElementById('pChemical').value) || 0;
+            var m = parseFloat(document.getElementById('pMaint').value) || 0;
+            var resMaint = document.getElementById('chkResMaint').checked;
+
+            var effMSRP = price + (resMaint ? m : 0);
+            var otherProds = w + t + c + (resMaint ? 0 : m);
+
+            var residualVal = effMSRP * resPct;
+            var grossCap = effMSRP + freight + otherProds;
+            var netCap = Math.max(0, grossCap - incentive - trade);
+            var depreciation = Math.max(0, netCap - residualVal);
+            var cashPrice = (grossCap - incentive - trade) * (1 + tax);
+
+            if (activeTab === 'used') {
+                var mf = baseRate / 2400;
+                var moDep = depreciation / term;
+                var moFin = (netCap + residualVal) * mf;
+                var moPay = (moDep + moFin) * (1 + tax);
+                var totalCost = moPay * term;
+
+                document.getElementById('outTotal').textContent = '$' + Math.round(moPay).toLocaleString() + ' /mo';
+                document.getElementById('outSub').textContent = 'Total Payments over ' + term + ' Months: $' + Math.round(totalCost).toLocaleString();
+                document.getElementById('resNetCap').textContent = '$' + Math.round(netCap).toLocaleString();
+                document.getElementById('resResidual').textContent = '$' + Math.round(residualVal).toLocaleString();
+                document.getElementById('resEffRate').textContent = baseRate.toFixed(2) + '%';
+
+                document.getElementById('rowCash').style.display = 'none';
+                document.getElementById('rowGicAmt').style.display = 'none';
+                document.getElementById('rowGicYield').style.display = 'none';
+                document.getElementById('rowSavings').style.display = 'none';
+                document.getElementById('rowAdvantage').style.display = 'none';
+            } else {
+                document.getElementById('rowCash').style.display = 'flex';
+                document.getElementById('rowGicAmt').style.display = 'flex';
+                document.getElementById('rowGicYield').style.display = 'flex';
+                document.getElementById('rowSavings').style.display = 'flex';
+                document.getElementById('rowAdvantage').style.display = 'flex';
+
+                var dtype = document.getElementById('selDealType').value;
+                var effRate = baseRate;
+                if (activeTab === 'manual') {
+                    if (dtype === 'standard') {
+                        effRate = parseFloat(document.getElementById('inpPvRate').value) || 0;
+                    } else {
+                        var disc = parseFloat(document.getElementById('inpRateDiscount').value) || 0;
+                        effRate = Math.max(0, baseRate - disc);
+                    }
+                }
+
+                var baseMF = baseRate / 2400;
+                var stdMoDep = depreciation / term;
+                var stdMoFin = (netCap + residualVal) * baseMF;
+                var stdTotal = (stdMoDep + stdMoFin) * (1 + tax) * term;
+
+                var eff
